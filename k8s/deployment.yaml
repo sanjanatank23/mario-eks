@@ -26,3 +26,14 @@ spec:
             limits:
               cpu: "200m"
               memory: "256Mi"
+              
+
+- name: Update deployment image
+  run: |
+    kubectl set image deployment/mario \
+      mario=$ECR_REPOSITORY:${{ github.sha }} \
+      --namespace default
+
+- name: Verify rollout
+  run: |
+    kubectl rollout status deployment/mario --namespace default

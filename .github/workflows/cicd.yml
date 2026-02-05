@@ -37,7 +37,8 @@ jobs:
       # 4️⃣ Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t $ECR_REPOSITORY:${{ github.sha }} .
+           docker build -t $ECR_REPOSITORY:${{ github.sha }} -f app/Dockerfile app
+          # docker build -t $ECR_REPOSITORY:${{ github.sha }} .
 
       # 5️⃣ Trivy security scan
       - name: Scan image with Trivy
