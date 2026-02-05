@@ -83,4 +83,4 @@ jobs:
           kubectl set image deployment/mario \
             mario=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:${{ github.sha }}
 
-        kubectl rollout status deployment/mario
+          kubectl rollout status deployment/mario
