@@ -44,14 +44,14 @@ jobs:
 
       # 5️⃣ Trivy security scan
       - name: Scan image with Trivy
-          uses: aquasecurity/trivy-action@0.20.0
-          with:
-          image-ref: ${{ env.IMAGE_URI }}
-          format: table
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+            image-ref: ${{ env.IMAGE_URI }}
+            format: table
+            exit-code: '1'
+            ignore-unfixed: true
+            vuln-type: 'os,library'
+            severity: 'CRITICAL,HIGH'
 
 
 
