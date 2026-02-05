@@ -11,6 +11,7 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
+  EKS_CLUSTER_NAME: mario-eks
   AWS_ACCOUNT_ID: 855158726462
   ECR_REPOSITORY: mario-game
   IMAGE_TAG: ${{ github.sha }}
@@ -71,9 +72,9 @@ jobs:
       # 7️⃣ Update kubeconfig
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig \
-            --region $AWS_REGION \
-            --name $EKS_CLUSTER_NAME
+         aws eks update-kubeconfig \
+          --region $AWS_REGION \
+          --name $EKS_CLUSTER_NAME
 
       # 8️⃣ Deploy to EKS
       - name: Deploy to EKS
