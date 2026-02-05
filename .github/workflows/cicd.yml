@@ -11,10 +11,9 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: 855158726462.dkr.ecr.us-east-1.amazonaws.com/mario-game
+  AWS_ACCOUNT_ID: 855158726462
+  ECR_REPOSITORY: mario-game
   IMAGE_TAG: ${{ github.sha }}
-  IMAGE_URI: 855158726462.dkr.ecr.us-east-1.amazonaws.com/mario-game:${{ github.sha }}
-
 
 jobs:
   build-and-deploy:
@@ -32,15 +31,20 @@ jobs:
           role-to-assume: arn:aws:iam::855158726462:role/github-actions-mario-eks-role
           aws-region: ${{ env.AWS_REGION }}
 
-      # 3️⃣ Login to Amazon ECR
       - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
+        run: |
+         aws ecr get-login-password --region $AWS_REGION \
+         | docker login --username AWS --password-stdin \
+         $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
 
       # 4️⃣ Build Docker image
       - name: Build Docker image
         run: |
-           docker build -t $ECR_REPOSITORY:${{ github.sha }} -f app/Dockerfile app
-          # docker build -t $ECR_REPOSITORY:${{ github.sha }} .
+         docker build \
+          -t $ECR_REPOSITORY:$IMAGE_TAG \
+          -f app/Dockerfile app
+
 
       # 5️⃣ Trivy security scan
       - name: Scan image with Trivy
@@ -58,14 +62,12 @@ jobs:
       # 6️⃣ Tag & push image to ECR
       - name: Push image to ECR
         run: |
-          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          ECR_URI=$ACCOUNT_ID.dkr.ecr.${AWS_REGION}.amazonaws.com/$ECR_REPOSITORY
+         docker tag $ECR_REPOSITORY:$IMAGE_TAG \
+          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
 
-          docker tag $ECR_REPOSITORY:${{ github.sha }} $ECR_URI:${{ github.sha }}
-          docker tag $ECR_REPOSITORY:${{ github.sha }} $ECR_URI:latest
+         docker push \
+          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
 
-          docker push $ECR_URI:${{ github.sha }}
-          docker push $ECR_URI:latest
 
       # 7️⃣ Update kubeconfig
       - name: Update kubeconfig
