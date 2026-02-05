@@ -41,17 +41,15 @@ jobs:
       # 4️⃣ Build Docker image
       - name: Build Docker image
         run: |
-         docker build \
-          -t $ECR_REPOSITORY:$IMAGE_TAG \
-          -f app/Dockerfile app
+         docker build -t mario-game:${{ github.sha }} -f app/Dockerfile app
+
 
 
       # 5️⃣ Trivy security scan
       - name: Scan image with Trivy
         uses: aquasecurity/trivy-action@0.20.0
         with:
-         image-ref: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-         format: table
+         image-ref: mario-game:${{ github.sha }}
          exit-code: 0
          ignore-unfixed: true
          vuln-type: os,library
